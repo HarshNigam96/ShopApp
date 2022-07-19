@@ -1,18 +1,25 @@
-import React, {useEffect} from 'react';
-import TabNav from '../BottomTab/index';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import DetailScreen from '../../../Screens/Detail';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React from 'react';
 import {TouchableOpacity} from 'react-native';
-import {useSelector, useDispatch} from 'react-redux';
-import OrderList from '../../../Components/OrderList';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useDispatch, useSelector} from 'react-redux';
+import DetailScreen from '../../../Screens/Detail';
 import Payment from '../../../Screens/Payment';
+import TabNav from '../BottomTab/index';
 
 const Stack = createNativeStackNavigator();
 
 const HomeStack = () => {
-  const data = useSelector(state => state.data);
+  const Cart = useSelector(state => state.cart);
   const dispatch = useDispatch();
+  const onClick = item => {
+    if (Cart.filter(val => val.id === item.id).length === 0) {
+      dispatch({type: 'ON_ADD', payload: item});
+    } else {
+      let remove = Cart.filter(val => val.id != item.id);
+      dispatch({type: 'ON_REMOVE', payload: remove});
+    }
+  };
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -26,16 +33,21 @@ const HomeStack = () => {
         options={({route}) => ({
           headerTitle: route.params.item.title,
           headerRight: () => (
-            <TouchableOpacity
-              onPress={() =>
-                route.params.item.inCart
-                  ? dispatch({type: 'ON_REMOVE', payload: route.params.item.id})
-                  : dispatch({type: 'ON_ADD', payload: route.params.item.id})
-              }>
+            <TouchableOpacity onPress={() => onClick(route.params.item)}>
               <Ionicons
-                name={route.params.item.inCart ? 'cart' : 'cart-outline'}
+                name={
+                  Cart.filter(val => val.id === route.params.item.id).length ===
+                  0
+                    ? 'cart-outline'
+                    : 'cart'
+                }
                 size={28}
-                color={route.params.item.inCart ? 'green' : 'black'}
+                color={
+                  Cart.filter(val => val.id === route.params.item.id).length ===
+                  0
+                    ? 'black'
+                    : 'green'
+                }
               />
             </TouchableOpacity>
           ),

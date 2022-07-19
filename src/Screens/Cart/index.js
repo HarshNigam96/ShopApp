@@ -1,44 +1,33 @@
-import React, { Component } from 'react'
-import { View, Text, FlatList } from 'react-native'
-import CartItems from '../../Components/CartItems'
-import { useSelector, useDispatch } from 'react-redux';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import React from 'react';
+import {FlatList, View} from 'react-native';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {useDispatch, useSelector} from 'react-redux';
+import CartItems from '../../Components/CartItems';
 
 const CartScreen = () => {
-  const Cart = useSelector(state => state.cart)
-  const dispatch = useDispatch()
-
-  const removeCart = (id) => {
-    Cart.map((val, i) => {
-      if (val.id === id) {
-        val.inCart = false
-        dispatch({ type: "ON_REMOVE", payload: val })
-      } else {
-        return val;
-      }
-    })
-  }
-
+  const Cart = useSelector(state => state.cart);
+  const dispatch = useDispatch();
+  const DeleteItem = item => {
+    let removeItem = Cart.filter(val => val.id !== item.id);
+    dispatch({type: 'ON_REMOVE', payload: removeItem});
+  };
   return (
-    <View style={{ backgroundColor: "white", flex: 1 }}>
+    <View style={{backgroundColor: 'white', flex: 1}}>
       <FlatList
         showsVerticalScrollIndicator={false}
         data={Cart}
-        renderItem={({ item, index }) =>
-          <View style={{ marginTop: index === 0 ? 0 : hp(3) }}>
+        renderItem={({item, index}) => (
+          <View style={{marginTop: index === 0 ? 0 : hp(3)}}>
             <CartItems
-              onPress={() =>  dispatch({ type: "ORDER_NOW", payload: item.id })}
-              img={item.img}
-              name={item.title}
-              price={item.price}
-              description={item.description}
-              onRemove={() => dispatch({ type: "ON_REMOVE", payload: item.id })}
+              props={item}
+              onRemove={() => DeleteItem(item)}
+              onPress={() => dispatch({type: 'ORDER_NOW', payload: item.id})}
             />
           </View>
-        }
+        )}
       />
     </View>
-  )
-}
+  );
+};
 
-export default CartScreen
+export default CartScreen;

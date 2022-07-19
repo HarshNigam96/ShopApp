@@ -9,26 +9,17 @@ const init = {
 const Reducer = (state = init, action) => {
   switch (action.type) {
     case 'ON_ADD':
-      const getData = state.data.find(val => val.id === action.payload);
       return {
         ...state,
-        data: state.data.map(val =>
-          val.id === action.payload ? {...val, inCart: true} : val,
-        ),
-        cart: [...state.cart, {...getData}],
+        cart: [...state.cart, action.payload],
       };
     case 'ON_REMOVE':
       return {
         ...state,
-        data: state.data.map(val =>
-          val.id === action.payload ? {...val, inCart: false} : val,
-        ),
-        cart: state.cart.filter((val, i) => val.id !== action.payload),
+        cart: action.payload,
       };
     case 'ORDER_NOW':
-      const getItem = state.data.find(
-        product => product.id === action.payload,
-      );
+      const getItem = state.data.find(product => product.id === action.payload);
       const availability = state.paymentArr.find(item =>
         item.id === action.payload ? true : false,
       );
@@ -38,7 +29,7 @@ const Reducer = (state = init, action) => {
           val.id === action.payload ? {...val, inCart: false} : val,
         ),
         cart: state.cart.filter((val, i) => val.id != action.payload),
-        
+
         paymentArr: availability
           ? state.paymentArr.map(val =>
               val.id === action.payload ? {...val, qty: val.qty + 1} : val,

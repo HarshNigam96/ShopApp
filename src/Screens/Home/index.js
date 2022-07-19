@@ -8,10 +8,18 @@ import {
 import {useSelector, useDispatch} from 'react-redux';
 
 const HomeScreen = props => {
+  const cartData = useSelector(state => state);
   const data = useSelector(state => state.data);
+
   const dispatch = useDispatch();
-
-
+  const onAddFav = item => {
+    if (cartData.cart.filter(val => val.id === item.id).length === 0) {
+      dispatch({type: 'ON_ADD', payload: item});
+    } else {
+      let rmv = cartData.cart.filter(val => val.id !== item.id);
+      dispatch({type: 'ON_REMOVE', payload: rmv});
+    }
+  };
   return (
     <View
       style={{flex: 1, backgroundColor: 'white', paddingHorizontal: wp(10)}}>
@@ -27,16 +35,13 @@ const HomeScreen = props => {
               marginBottom: hp(1),
             }}>
             <Card
-              name={item.title}
-              price={item.price}
-              img={item.img}
-              iconName={item.inCart ? 'cart' : 'cart-outline'}
-              iconColor={item.inCart ? 'green' : 'black'}
+              props={item}
               onClick={() => props.navigation.navigate('Detail', {item})}
-              onPress={() =>
-                item.inCart
-                  ?  dispatch({type: 'ON_REMOVE', payload: item.id})
-                  : dispatch({type: 'ON_ADD', payload: item.id})
+              onPress={() => onAddFav(item)}
+              add_cart={
+                cartData.cart.filter(ele => ele.id == item.id).length === 0
+                  ? null
+                  : true
               }
             />
           </View>
